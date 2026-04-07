@@ -9,28 +9,8 @@ Issues Identified:
 
 impact:
 Data inconsistency, duplicate records, system crashes, and violation of business rules.
-Fixed Approach:
-@Transactional
-public Long createProduct(CreateProductRequest req) {
-    if (productRepo.existsBySku(req.sku)) {
-        throw new ApiException("SKU already exists", HttpStatus.BAD_REQUEST);
-    }
-    Warehouse warehouse = warehouseRepo.findById(req.warehouseId)
-        .orElseThrow(() -> new ApiException("Warehouse not found", HttpStatus.NOT_FOUND));
-    Product product = new Product();
-    product.setName(req.name);
-    product.setSku(req.sku);
-    product.setPrice(req.price);
-    productRepo.save(product);
-    if (req.initialQuantity != null) {
-        Inventory inv = new Inventory();
-        inv.setProductId(product.getId());
-        inv.setWarehouseId(warehouse.getId());
-        inv.setQuantity(req.initialQuantity);
-        inventoryRepo.save(inv);
-    }
-    return product.getId();
-}
+
+   
 
 Part 2: Database Design
 Key Tables:
@@ -53,10 +33,6 @@ Logic:
 • Filter by recent sales.
 • Calculate average usage and stockout days.
 
-• Attach supplier details.
-int avg = totalSales / 7;
-if (avg == 0) avg = 1;
-int daysLeft = inventory / avg;
 
 Edge Cases:
 • No warehouses or inventory → empty response.
